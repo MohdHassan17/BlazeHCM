@@ -191,7 +191,7 @@ export const amendAttendance = async (req, res) => {
       success: false,
       message: "Check-in time must be before check-out time",
     });
-  }
+  } 
 
   try {
     const employee = await Employee.findById(id);
