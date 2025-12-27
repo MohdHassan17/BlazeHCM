@@ -5,6 +5,7 @@ import {
   createShiftException,
   deleteShift,
   getAllShifts,
+  getShiftExceptionByQuery,
   getSingleShift,
   updateShift,
 } from "../controllers/shiftController.js";
@@ -21,7 +22,7 @@ router.patch("/update-shift/:id", updateShift)
 
 // Shift Exception Routes
 router.post("/create-exception", createShiftException);
-
+router.get("/get-shift-exception", getShiftExceptionByQuery)
 // Shift Assignment Routes
 router.patch("/assign-shift", assignShift)
 export default router;

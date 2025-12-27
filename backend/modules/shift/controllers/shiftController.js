@@ -80,7 +80,7 @@ export const updateShift = async (req, res) => {
   }
 
   try {
-    const updatedShift = await Shift.findByIdAndUpdate(id, { ...req.body });
+    const updatedShift = await Shift.findByIdAndUpdate(id, { ...req.body }, {new: true});
 
     return res.status(200).json({
       success: true,
@@ -160,10 +160,50 @@ export const createShiftException = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "There was an error in processing your request",
+      message: `${error}`
+
     });
   }
 };
+
+
+export const getShiftExceptionByQuery = async (req,res) => {
+
+  const { employee, date} = req.body
+
+  const employeeExists = await Employee.findById(employee)
+
+  if(!employeeExists){
+    return res.status(404).json({ 
+      success: false,
+      message: "Employee not found"
+    })
+  }
+
+  try{
+    const shiftException = await ShiftException.find({employee: employee})
+
+    if(!shiftException) {
+       return res.status(404).json({
+      success: false,
+      message: "Employee not found"
+    })
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Shift found",
+      data: shiftException
+    })
+  
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: `${error}`
+
+    });
+  }  
+}
 
 // Employee Shift Assignment Related Logic
 

@@ -13,8 +13,9 @@ const employeeSchema = new mongoose.Schema(
     employeeId: { type: String, required: true, unique: true },
     designation: { type: String },
     dateOfJoining: { type: Date, default: Date.now },
-
-
+    dateOfExit: { type: Date, default: null },
+    
+    
     shift: { type: mongoose.Schema.Types.ObjectId, ref: "Shift" },
     status: {
       type: String,
@@ -26,8 +27,17 @@ const employeeSchema = new mongoose.Schema(
     documents: { cnic: { type: String }, contract: { type: String }, offerLetter: { type: String } },
 
     role: { type: String, enum: ["Employee", "Manager", "HR", "Admin"], default: "Employee" },
+    salary: {
+      basic: {type: Number},
+      homeAllowance: {type: Number},
+      medicalAllowance: {type: Number},
+      utilityAllowance: {type: Number},
+
+    },
+
 
     leaveBalances: { casual: { type: Number, default: 0 }, sick: { type: Number, default: 0 }, annual: { type: Number, default: 0 } },
+  
   },
   { timestamps: true }
 );

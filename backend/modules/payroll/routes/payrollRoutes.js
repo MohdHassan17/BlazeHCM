@@ -1,7 +1,9 @@
 import express from 'express';
-import { placeholder } from '../controllers/payrollController.js';
+import { runPayroll } from '../controllers/payrollController.js';
 
 const router = express.Router();
-router.get('/ping', placeholder);
+
+
+router.post('/run-payroll', runPayroll);
 
 export default router;
