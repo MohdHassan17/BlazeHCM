@@ -5,7 +5,9 @@ import employeeService from "../../../services/employee/employee.service.js";
 export const runPayroll = async (req, res) => {
   const { payrollMonth, payrollYear = 2025 } = req.body;
 
+  
   try {
+    console.log(payrollMonth)
     const period = {
       startDate: new Date(Date.UTC(payrollYear, payrollMonth - 1, 1, 0, 0, 0)), // Nov 1, 00:00 UTC
       endDate: new Date(Date.UTC(payrollYear, payrollMonth, 0, 23, 59, 59)),

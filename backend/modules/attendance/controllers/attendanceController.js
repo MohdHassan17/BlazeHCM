@@ -1,222 +1,30 @@
 import Attendance from "../models/attendanceSchema.js";
 import Employee from "../../employee/models/employeeSchema.js";
 import AttendanceRequest from "../models/attendanceRequestSchema.js";
-import ShiftException from "../../shift/models/shiftException.js";
+import attendanceService from "../../../services/attendance/attendance.service.js";
+
 
 //Marks attendance (check-in/check-out) for an employee
 export const markAttendance = async (req, res) => {
-  const id = req.params.id;
+  const employeeId = req.params.employeeId;
   const { punchTime } = req.body;
 
-  const employee = await Employee.findById(id).populate("shift");
 
-  if (!employee) {
-    return res
-      .status(404)
-      .json({ success: false, message: "Employee not found" });
-  }
-
-  if (!punchTime) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Punch time is required" });
-  }
-
-  const punchDate = new Date(punchTime);
-  if (isNaN(punchDate.getTime())) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid punch time format" });
-  }
 
   try {
-    // Helper: convert a time string "HH:mm" or "HH:mm:ss" into a Date on the same day as `baseDate`
-    const timeStringToDateOnDay = (baseDate, timeString) => {
-      const parts = (timeString || "").split(":").map(Number);
-      const hours = parts[0] || 0;
-      const minutes = parts[1] || 0;
-      const d = new Date(baseDate);
-      d.setHours(hours, minutes, 0, 0);
-      return d;
-    };
+    const result = await attendanceService.createAttendance(employeeId, punchTime);
+    if (!result.success) {
+      return res.status(result.statusCode).json({
+        success: false,
+        message: result.message,
+      });
+    }
 
-    // Getting the Shift Start Time, End Time, and Work Hours For validating the final status of the attendance
-    const shiftStartDate = timeStringToDateOnDay(
-      punchDate,
-      employee.shift?.startTime || "00:00"
-    );
-    const shiftEndDate = timeStringToDateOnDay(
-      punchDate,
-      employee.shift?.endTime || "23:59"
-    );
-    const workingHours = employee.shift?.workingHours;
-    const graceMinutes =
-      typeof employee.shift?.graceMinutes === "number"
-        ? employee.shift.graceMinutes
-        : 0;
-
-    // console.log(graceMinutes, "graceMinutes");
-    // allowedStart = shift start + grace (if any)
-    const allowedStart = new Date(shiftStartDate);
-    if (graceMinutes > 0)
-      allowedStart.setMinutes(allowedStart.getMinutes() + graceMinutes);
-
-    // console.log(
-    //   shiftStartDate.toTimeString(),
-    //   shiftEndDate.toTimeString(),
-    //   "allowedStart:",
-    //   allowedStart.toTimeString()
-    // );
-
-    const startOfDay = new Date(punchDate);
-    startOfDay.setHours(0, 0, 0, 0);
-
-    const endOfDay = new Date(punchDate);
-    endOfDay.setHours(23, 59, 59, 999);
-
-    let attendance = await Attendance.findOne({
-      employee: id,
-      date: { $gte: startOfDay, $lte: endOfDay },
+    return res.status(result.statusCode).json({
+      success: true,
+      message: result.message,
+      data: result.data,
     });
-
-    // console.log("Start and end ", startOfDay, endOfDay);
-    //! Checking if any shift exception is assigned to any employee
-
-    const startOfExceptionDay = new Date(punchDate);
-    startOfExceptionDay.setUTCHours(0, 0, 0, 0);
-
-    const endOfExceptionDay = new Date(punchDate);
-    endOfExceptionDay.setHours(23, 59, 59, 999);
-
-    // console.log(startOfExceptionDay)
-
-    const shiftException = await ShiftException.findOne({
-      employee: id,
-      date: startOfExceptionDay,
-    }).populate("shift");
-
-    // Safely derive exception shift values (may be null if no exception)
-    const exceptionLateAfter = shiftException?.shift?.lateAfter
-      ? timeStringToDateOnDay(punchDate, shiftException.shift.startTime)
-      : null;
-
-   
-    const exceptionWorkingHours =
-      typeof shiftException?.shift?.workingHours === "number"
-        ? shiftException?.shift?.workingHours
-        : null;
-
-    const exceptionGraceMinutes =
-      typeof shiftException?.shift?.graceMinutes === "number"
-        ? shiftException?.shift?.graceMinutes
-        : 0;
-
-    // exceptionAllowedStart = exception start + exception grace (if any)
-    const exceptionAllowedStart = exceptionLateAfter
-      ? new Date(exceptionLateAfter)
-      : null;
-    if (exceptionAllowedStart && exceptionGraceMinutes > 0) {
-      exceptionAllowedStart.setMinutes(
-        exceptionAllowedStart.getMinutes() + exceptionGraceMinutes
-      );
-    }
-
-    console.log(
-      exceptionLateAfter,
-      exceptionAllowedStart,
-      shiftException?.shift?.lateAfter
-    )
-
-    // debug
-    // console.log("shiftException present:" , shiftException);
-    // console.log(
-    //   "shiftAllowedStart:",
-    //   allowedStart.toTimeString(),
-    //   "exceptionAllowedStart:",
-    //   exceptionAllowedStart ? exceptionAllowedStart.toTimeString() : "N/A"
-    // );
-    //! Start of Attendance Marking Logic
-
-
-    //TODO: If check-in exists but no check-out, then mark check-out
-    if (attendance) {
-      if (attendance.checkInTime && !attendance.checkOutTime) {
-        if (punchDate <= attendance.checkInTime) {
-          return res.status(400).json({
-            success: false,
-            message: "Checkout time must be after check-in time",
-          });
-        }
-
-        const workedHours =
-          (punchDate - attendance.checkInTime) / (1000 * 60 * 60);
-
-        // If the Shift Exception exists, then use the exception shift timings to validate the attendance status
-        let status; // Initializing a common status to be used based on Shift Exception existence
-
-        if (shiftException) {
-          if (typeof exceptionWorkingHours === "number") {
-            if (workedHours < exceptionWorkingHours) {
-              status = "Short Hours";
-              console.log("Short Hours marked based on Exception");
-            }
-          }
-        } else {
-          if (typeof workingHours === "number") {
-            if (workedHours < workingHours) {
-              status = "Short Hours";
-              console.log("Calculated based on default shift hours");
-            }
-          }
-        }
-
-        if (status) attendance.status = status;
-        attendance.checkOutTime = punchDate;
-        // persist total hours for later reporting
-        attendance.totalHours = workedHours;
-        await attendance.save();
-
-        return res.status(200).json({
-          success: true,
-          message: `Checkout marked successfully ${attendance.totalHours.toFixed(
-            2
-          )} hours worked today`,
-          data: attendance,
-        });
-      }
-
-      if (attendance.checkInTime && attendance.checkOutTime) {
-        return res.status(400).json({
-          success: false,
-          message: "Attendance already marked for today",
-        });
-      }
-    } else {
-
-      //TODO: Determine status based on shift timings and grace period and mark check-in
-      let status;
-
-      // Compare punchTime with allowedStart (shift start + grace)
-      const compareAllowedStart = exceptionAllowedStart || allowedStart;
-      status = punchDate > compareAllowedStart ? "Late" : "Present";
-      console.log( exceptionAllowedStart);
-      console.log(status);
-      const newAttendance = new Attendance({
-        employee: id,
-        status: status,
-        checkInTime: punchDate,
-        date: endOfDay,
-      });
-      await newAttendance.save();
-      return res.status(201).json({
-        success: true,
-        message: "Check-in marked successfully",
-        data: newAttendance,
-      });
-    }
-
-    //! End of Attendance Marking Logic
-
   } catch (e) {
     return res.status(500).json({
       success: false,
@@ -226,7 +34,47 @@ export const markAttendance = async (req, res) => {
   }
 };
 
-// Export
+// Mark Attendance From File (Bulk Upload)
+export const attendanceFromFile = async (req, res) => {
+
+
+  try{
+
+
+    //* 1. Check if the file even exists 
+
+    if(!req.file){
+      return res.status(400).json({
+        success: false,
+        message: "File has not been uploaded"
+      })
+    }
+
+    //* 2. Pass the file to service
+
+    const result = await attendanceService.bulkAttendance(req.file.buffer)
+
+    // Return the service result to the client
+    if (!result.success) {
+      return res.status(result.statusCode || 400).json({
+        success: false,
+        message: result.message,
+        data: result.data,
+      });
+    }
+
+    return res.status(result.statusCode || 200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+    });
+  }catch (error){
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+}
 
 
 export const getAttendanceTime = async (req, res) => {
@@ -319,7 +167,7 @@ export const amendAttendance = async (req, res) => {
       checkInTime: checkInTime,
       checkOutTime: checkOutTime,
       status: "pending",
-      message: message,
+      message: message, 
     });
     await newAttendanceRequest.save();
 
@@ -453,7 +301,7 @@ export const getAttendanceByEmployee = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const employee = await Employee.findById(id);
+    const employee = await Employee.findOne({employeeId: id});
     if (!employee)
       return res
         .status(404)
