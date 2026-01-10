@@ -5,6 +5,7 @@ const userRole = new mongoose.Schema(
     name: { type: String, required: true },
     permissions: {
       manageSelf: { type: Boolean, default: true },
+      manageSubOrdinateRequest: {type: Boolean, default: false},
       manageEmployee: { type: Boolean, default: false },
       manageAttendance: { type: Boolean, default: false },
       managePayroll: { type: Boolean, default: false },

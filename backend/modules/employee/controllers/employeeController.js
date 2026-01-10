@@ -1,10 +1,15 @@
 import Employee from "../models/employeeSchema.js";
 import Company from "../../company/models/companySchema.js";
-import XLSX from "xlsx";
 import employeeService from "../../../services/employee/employee.service.js";
+import { createUser, getUserByEmployeeId } from "../../../services/auth/auth.service.js";
+
 
 export const createEmployee = async (req, res) => {
   try {
+
+    const {userLogin, ...body } = req.body;
+
+
     const company = await Company.findOne({ companyID: 1 });
     if (!company)
       return res
@@ -19,6 +24,19 @@ export const createEmployee = async (req, res) => {
 
     const newEmployee = new Employee({ ...req.body, leaveBalances });
     await newEmployee.save();
+
+    // Create associated user account
+    if(userLogin.allowLogin){
+      const newUser = await createUser({
+        employee: newEmployee._id, email: newEmployee.email, password: userLogin.password || "defaultPassword123", role: userLogin.role || null
+      }); 
+      console.log(newUser)
+
+    }
+
+
+
+    
 
     return res.status(201).json({
       success: true,
@@ -105,11 +123,22 @@ export const exportEmployeesFile = async (req, res) => {
 export const getSingleEmployee = async (req, res) => {
   const id = req.params.id;
   try {
+
+    // *1. Finding employee by ID and checking if it exists
+
     const employee = await Employee.findById(id);
+
     if (!employee)
       return res
         .status(404)
         .json({ success: false, message: "Employee not found" });
+
+
+    // *2. Also add user details if exists
+    const user = await getUserByEmployeeId(id);
+    if(user){
+      employee._doc.user = user; // ._doc to add custom fields to the Employee Doc
+    }
     return res.status(200).json({
       success: true,
       message: "Employee retrieved successfully",

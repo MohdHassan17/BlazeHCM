@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
-const user = new mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
     employee: { type: mongoose.Schema.Types.ObjectId, ref: "Employee" },
     role: { type: mongoose.Schema.Types.ObjectId, ref: "UserRole" },
@@ -20,6 +20,6 @@ userSchema.pre("save", async function(next) {
 });
 
 
-const User = mongoose.model("User", user);
+const User = mongoose.model("User", userSchema);
 
 export default User;

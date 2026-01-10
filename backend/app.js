@@ -12,6 +12,7 @@ import leaveRoutes from "./modules/leave/routes/leaveRoutes.js";
 import attendanceRoutes from "./modules/attendance/routes/attendanceRoutes.js";
 import shiftRoutes from './modules/shift/routes/shiftRoutes.js'
 import payrollRoutes from './modules/payroll/routes/payrollRoutes.js'
+import authRoutes from './modules/auth/routes/authRoutes.js'
 
 dotenv.config();
 
@@ -40,6 +41,7 @@ app.use('/api/leaves', leaveRoutes);
 app.use('/api/attendance', attendanceRoutes)
 app.use('/api/shift', shiftRoutes)
 app.use('/api/payroll', payrollRoutes)
+app.use('/api/auth', authRoutes)
 
 
 
