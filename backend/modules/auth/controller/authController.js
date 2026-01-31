@@ -53,10 +53,14 @@ export const loginUserController = async (req,res) => {
     //   maxAge: 7 * 24 * 60 * 60 * 1000
     // })
 
+    console.log(userLogin.accessToken)
+
+
     res.status(200).json({
       success: true,
       message: "User Logged In",
-      data: userLogin.accessToken,
+      accessToken: userLogin.accessToken,
+      user: userLogin.user
 
     })
 

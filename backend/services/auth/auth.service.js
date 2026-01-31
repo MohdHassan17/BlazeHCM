@@ -44,7 +44,7 @@ export const getUserByEmployeeId = async (employeeId) => {
 export const loginUser = async(email, password) => {
   try{
 
-    const user = await User.findOne({ email: email }).populate(['role', 'employee']);
+    const user = await User.findOne({ email: email }).populate(['employee', 'role'])
 
     if (!user) {
       return { success: false, message: "User not found" };
@@ -57,9 +57,12 @@ export const loginUser = async(email, password) => {
       return { success: false, message: "Invalid password" };
     }
 
-    const accessToken = signToken({ userId: user._id, employeeID: user.employee?.employeeId, email: user.email, permissions: user.role?.permissions });
+    
 
-    return { success: true, user, accessToken };  
+    const accessToken = signToken({ userId: user._id, employeeId: user.employee?.employeeId, employeeName: user.employee?.firstname, permissions: user.role?.permissions });
+
+    console.log("Generated Access Token:", accessToken);
+    return { success: true, accessToken: accessToken };  
 
   }catch(error){
     return { success: false, message: error.message };

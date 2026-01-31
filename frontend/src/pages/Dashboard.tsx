@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import Layout from "../layout/Layout";
 import {
   ArrowUpRightIcon,
@@ -38,8 +38,11 @@ import {
 import ActionButton from "../ui/ActionButton";
 import { Badge } from "../components/ui/badge";
 import { Card, CardContent } from "../components/ui/card";
+import { AuthContext } from "../context/authContext";
 
 function Dashboard() {
+
+  const { employeeName} = useContext(AuthContext)!;
   return (
     <>
       <title>Dashboard • Tesseract</title>
@@ -48,7 +51,7 @@ function Dashboard() {
           <div className="">
             {/* Inset Header */}
             <h1 className="mt-1 text-xl font-bold tracking-tight lg:text-2xl text-(--text-heading)  ">
-              Welcome, Hassan!{" "}
+              Welcome, {employeeName}!{" "}
             </h1>
             <div className="flex w-full flex-col gap-4 mt-4">
               {/* -- ATTENDANCE SUMMARY -- */}

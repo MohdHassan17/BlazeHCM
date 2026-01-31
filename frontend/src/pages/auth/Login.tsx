@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import LoginBG from "../../assets/components/login-bg.webp";
 import { useForm, Controller } from "react-hook-form";
 import * as z from "zod";
@@ -19,7 +19,9 @@ import {
 } from "../../components/ui/field";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
-import BlazeHCM from '../../assets/logo/logo.png'
+import BlazeHCM from "../../assets/logo/logo.png";
+import { AuthContext } from "../../context/authContext";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   return (
@@ -36,10 +38,19 @@ function Login() {
 }
 
 function LoginForm() {
+  //* Getting Login Function From Auth
+
+  const navigate = useNavigate();
+  const { isAuthenticated, handleLogin } = useContext(AuthContext)!;
+
+    if(isAuthenticated){
+        navigate('/home');
+    }
+
+  
+  
   const loginSchema = z.object({
-    email: z
-      .email()
-      .min(1, "Email is required"),
+    email: z.email().min(1, "Email is required"),
     password: z.string().min(6, "Password must be at least 6 characters long"),
   });
 
@@ -54,14 +65,14 @@ function LoginForm() {
     <Card className="w-[400px] ">
       <CardHeader className="items-center gap-2">
         <div className="">
-            <img src={BlazeHCM} alt="BlazeHCM Logo" className="w-20 h-20" />
+          <img src={BlazeHCM} alt="BlazeHCM Logo" className="w-20 h-20" />
         </div>
         <CardTitle className="text-2xl">Login to BlazeHCM</CardTitle>
         <CardDescription>
           Enter your credentials to access your account
         </CardDescription>
       </CardHeader>
-      <form onSubmit={form.handleSubmit((data) => console.log(data))}>
+      <form onSubmit={form.handleSubmit((data) => handleLogin(data.email, data.password))}>
         <CardContent>
           <FieldGroup>
             <Controller
