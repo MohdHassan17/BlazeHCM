@@ -1,9 +1,15 @@
-import { createNewRole, getRoles} from "../controller/authController.js";
+import { createNewRole, getRoles, loginUserController} from "../controller/authController.js";
+import { createNewUser } from "../controller/authController.js";
 import express from "express"
 
 const router = express.Router()
 
+
+// Create User Routes (might only be used for testing purposes)
+router.post("/create-user", createNewUser)
+
 //Sign-in Routes
+router.post('/login', loginUserController)
 
 
 // Role Routes 

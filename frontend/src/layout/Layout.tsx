@@ -32,7 +32,7 @@ function Layout({ children }: LayoutProps) {
           <SidebarInset className="min-h-screen p-2">
             <div className="min-h-screen  rounded-lg bg-white shadow-md border">
               <TopNav Trigger={SidebarTrigger} />
-              <div className="min-h-screen p-(--content-padding) bg-(--secondary-background) ">
+              <div className="min-h-screen p-(--content-padding)  bg-(--secondary-background) rounded-md ">
                 {/* BreadCrumb Wrapper */}
             <div className="">
               <BreadcrumbComponent links={breadCrumbLinks}/> 

@@ -3,6 +3,7 @@ import './index.css'
 
 //Pages Import
 import Dashboard from './pages/Dashboard'
+import  Login from './pages/auth/Login'
 
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
     <>
  <Routes>
     <Route path='/home' element={<Dashboard/>}/>
+    <Route path='/login' element={<Login/>}/>
   </Routes>       
         
         </>

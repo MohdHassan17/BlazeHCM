@@ -12,7 +12,7 @@
   --font-family-sans: "Outfit", system-ui, sans-serif;
   --breakpoint-3xl: 1920px;
   --radius: 0.625rem;
-  --background: #f4f4f6;
+  --background: #03071e;
   --secondary-background: #fbfbfb;
   --foreground: #090909;
   --card: oklch(1 0 0);
@@ -36,9 +36,9 @@
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  
+
   /* !Custom Colors Only */
-  --color-digital-blue-50: oklch(95.13% 0.023 256.1);
+  /* --color-digital-blue-50: oklch(95.13% 0.023 256.1);
   --color-digital-blue-100: oklch(90.17% 0.048 259.1);
   --color-digital-blue-200: oklch(80.72% 0.097 258.14);
   --color-digital-blue-300: oklch(71.49% 0.149 258.39);
@@ -48,14 +48,37 @@
   --color-digital-blue-700: oklch(39.11% 0.161 260.13);
   --color-digital-blue-800: oklch(29.89% 0.116 259.04);
   --color-digital-blue-900: oklch(19.67% 0.068 256.39);
-  --color-digital-blue-950: oklch(16.49% 0.052 253.9);
+  --color-digital-blue-950: oklch(16.49% 0.052 253.9); */
 
+  /* *Blue */
+  --color-ink-black-50: #e8ebfd;
+  --color-ink-black-100: #d1d7fa;
+  --color-ink-black-200: #a2aff6;
+  --color-ink-black-300: #7487f1;
+  --color-ink-black-400: #455eed;
+  --color-ink-black-500: #1736e8;
+  --color-ink-black-600: #122bba;
+  --color-ink-black-700: #0e218b;
+  --color-ink-black-800: #09165d;
+  --color-ink-black-900: #050b2e;
+  --color-ink-black-950: #030820; /*? Important */
 
-  --color-gray-primary: var(--color-gray-200);
+  /* Orange */
+  --color-brick-ember-50: #ffe5e5;
+  --color-brick-ember-100: #ffcccc;
+  --color-brick-ember-200: #ff9999;
+  --color-brick-ember-300: #ff6666;
+  --color-brick-ember-400: #ff3333;
+  --color-brick-ember-500: #ff0000;
+  --color-brick-ember-600: #cc0000; /*? Important */
+  --color-brick-ember-700: #990000;
+  --color-brick-ember-800: #660000;
+  --color-brick-ember-900: #330000;
+  --color-brick-ember-950: #240000;
+
+  --color-gray-primary: var(--color-gray-100);
   --color-gray-secondary: var(--color-gray-500);
 
-  
-  
   /* ! Effect Colours  */
   --positive-background: #f0fdf4;
   --positive-foreground: #05df72;
@@ -63,9 +86,8 @@
 
   /* ! Button Colors */
   /* ?Background */
-  --default: var(--color-digital-blue-700);
-  --secondary: #14b24b;
-  
+  --default: var(--color-brick-ember-500);
+  --secondary: var(--color-ink-black-500);
 
   /*! Text Colours */
   --text-primary: var(--color-gray-secondary);
@@ -75,8 +97,6 @@
 
   /*!Spacing and Padding */
   --content-padding: calc(var(--spacing) * 4);
-  
-
 
   /* *SideBar Colors  */
   --sidebar: oklch(0.984 0.003 247.858);
@@ -88,14 +108,14 @@
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
 
-  --sidebar: #f4f4f6;
+  --sidebar: #03071e;
   --sidebar-foreground: oklch(0.129 0.042 264.695);
   --sidebar-primary: oklch(0.208 0.042 265.755);
   --sidebar-primary-foreground: red;
   --sidebar-accent: var(--color-gray-primary);
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
-  --sidebar-ring: var(--color-gray-secondary);
+  --sidebar-ring: var(--color-gray-300);
 }
 
 @theme inline {
@@ -184,5 +204,5 @@
 
 body {
   font-family: var(--font-family-sans);
-  color: var(--text-primary)
+  color: var(--text-primary);
 }

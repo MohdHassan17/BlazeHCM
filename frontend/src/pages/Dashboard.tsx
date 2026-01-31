@@ -2,9 +2,12 @@ import React from "react";
 import Layout from "../layout/Layout";
 import {
   ArrowUpRightIcon,
+  Ban,
   ChartColumnIncreasing,
   ClockArrowUp,
   Plane,
+  TimerIcon,
+  TimerOff,
 } from "lucide-react";
 import { ScrollArea } from "../components/ui/scroll-area";
 import AttendanceChart from "../components/dashboard/AttendanceChart";
@@ -33,6 +36,8 @@ import {
   TableRow,
 } from "../components/ui/table";
 import ActionButton from "../ui/ActionButton";
+import { Badge } from "../components/ui/badge";
+import { Card, CardContent } from "../components/ui/card";
 
 function Dashboard() {
   return (
@@ -46,23 +51,62 @@ function Dashboard() {
               Welcome, Hassan!{" "}
             </h1>
             <div className="flex w-full flex-col gap-4 mt-4">
+              {/* -- ATTENDANCE SUMMARY -- */}
+              <div className="w-full flex flex-col lg:flex-row gap-2">
+                <AttendanceSummaryCard
+                  className="flex-1  "
+                  variant="Present"
+                  title="Present Days"
+                  value={20}
+                  workingDays={20}
+                  icon = {<TimerIcon/>}
+               />
+                <AttendanceSummaryCard
+                  className="flex-1"
+                  variant="Late"
+                  title="Lates"
+                  value={3}
+                  workingDays={20}
+                  icon = {<TimerOff/> }
+                />
+                <AttendanceSummaryCard
+                  className="flex-1"
+                  variant="Absent"
+                  title="Absent Days"
+                  value={2}
+                  workingDays={20}
+                  icon={<Ban/> }
+                />
+                <AttendanceSummaryCard
+                  className="flex-1"
+                  variant="HalfDay"
+                  title="Leaves"
+                  value={20}
+                  workingDays={20}
+                  icon = {<Plane/> }
+                />
+              </div>
               {/* --ATTENDANCE CHART-- */}
-              <div className="w-full border shadow-md p-2 rounded-lg flex flex-col gap-2">
-                <div className="flex justify-between">
-                  {/* Chart Heading */}
-                  <Heading
-                    text="Attendance Summary"
-                    icon={<ChartColumnIncreasing size={20} />}
-                  />
+              <div className="flex gap-2">
+                <div className="flex-3 w-full border shadow-md p-2 rounded-lg flex  flex-col gap-2">
+                  <div className="flex flex-3 justify-between">
+                    {/* Chart Heading */}
+                    <Heading
+                      text="Attendance Summary"
+                      icon={<ChartColumnIncreasing size={20} />}
+                    />
 
-                  {/* Month Select Dropdown */}
-                  <SelectMonthDropdown />
+                    {/* Month Select Dropdown */}
+                    <SelectMonthDropdown />
+                  </div>
+
+                  <AttendanceChart />
                 </div>
-                <AttendanceChart />
               </div>
 
-              {/*  --MISSING ENTRY AND REQUESTS MENUS--  */}
+              {/*  --MISSING ENTRY / LEAVE SUMMARY / REQUEST--  */}
               <div className="w-full flex flex-col lg:flex-row gap-4  ">
+                {/*  --Missing Entries-- */}
                 <div className=" flex-1 h-[300px] rounded-lg shadow-md border p-2 flex flex-col gap-2 ">
                   <Heading
                     text="Discrepant Entries"
@@ -74,7 +118,7 @@ function Dashboard() {
                       className="overflow-y-scroll h-full relative"
                       defaultValue="missing"
                     >
-                      <TabsList className="sticky top-0 z-10">
+                      <TabsList className="sticky top-0 z-10 bg-(--color-brick-ember-50) ">
                         <TabsTrigger
                           value="missing"
                           className="  border-1 rounded-lg"
@@ -93,13 +137,95 @@ function Dashboard() {
                     </Tabs>
                   </ScrollArea>
                 </div>
-                <div className="flex-1"></div>
-                <div className="flex-1"></div>
+                <div className=" flex-1 h-[300px] rounded-lg shadow-md border p-2 flex flex-col gap-2 ">
+                  <Heading
+                    text="My Requests"
+                    icon={<ChartColumnIncreasing size={20} />}
+                  />
+
+                  <RequestsMenu />
+
+                  <ScrollArea></ScrollArea>
+                </div>
               </div>
             </div>
           </div>
         </ScrollArea>
       </Layout>
+    </>
+  );
+}
+
+type SummaryCardProps = {
+  className?: string;
+  title: string;
+  value: number;
+  variant: "Present" | "Late" | "Absent" | "HalfDay";
+  workingDays: number;
+  icon: React.ReactNode
+};
+
+function AttendanceSummaryCard({
+  className,
+  title,
+  value,
+  variant,
+  workingDays,
+  icon
+}: SummaryCardProps) {
+  const VARIANTS: Record<string, { bg: string; text: string }> = {
+    Present: {
+      bg: "#e4fcfe",
+      text: "#005f78",
+    },
+    Late: {
+      bg: "#fffcde",
+      text: "#894b00",
+    },
+    Absent: {
+      bg: "#fdf1f8",
+      text: "#a3004c",
+    },
+    HalfDay: {
+      bg: "#ebfdf1",
+      text: "#016630",
+    },
+  };
+
+  const current = VARIANTS[variant];
+  return (
+    <>
+      <Card
+        className={`rounded-md h-[200px] shadow-none border-none  ${className && className}  `}
+      >
+        <CardContent
+          className="h-full rounded-md  flex items-center"
+          style={{
+            backgroundColor: current.bg,
+          }}
+        >
+          <div className="w-full flex flex-col gap-4 ">
+            <div
+              className="p-2 w-10 h-10 rounded-md text-white"
+              style={{ backgroundColor: current.text }}
+            >
+            {icon}
+            </div>
+            <div className=" flex flex-col gap-[2px] ">
+              <div className="text-muted-foreground text-sm"> {title} </div>
+              <div
+                className="text-3xl font-semibold"
+                style={{ color: current.text }}
+              >
+                {value}{" "}
+              </div>
+              <div className="text-muted-foreground text-sm">
+                Working Days: {workingDays}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </>
   );
 }
@@ -231,6 +357,41 @@ function AbsentsMenu() {
               </TableCell>
             </TableRow>
           ))}
+        </TableBody>
+      </Table>
+    </>
+  );
+}
+
+function RequestsMenu() {
+  return (
+    <>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="text-(--color-digital-blue-600)">
+              {" "}
+              Type
+            </TableHead>
+            <TableHead className="text-(--color-digital-blue-600)">
+              {" "}
+              Value
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody className="overflow-hidden">
+          <TableRow>
+            <TableCell>Attendance Requests</TableCell>
+            <TableCell>
+              <Badge className="bg-(--default) hover:bg-(--default)/90 cursor-pointer">20</Badge>
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>Leave Requests</TableCell>
+            <TableCell>
+              <Badge  className="bg-(--default) hover:bg-(--default)/90 cursor-pointer">20</Badge>
+            </TableCell>
+          </TableRow>
         </TableBody>
       </Table>
     </>

@@ -254,7 +254,7 @@ function AppSidebar({url} : {url:string}) {
             </div>
 
             <div  className=" group-data-[collapsible=icon]:hidden transition-all duration-300 ease-in-out">
-              <span className="font-semibold text-base text-[#27272b]">
+              <span className="font-semibold text-base text-(--sidebar-ring)  ">
                 BlazeHCM
               </span>
             </div>
@@ -264,18 +264,19 @@ function AppSidebar({url} : {url:string}) {
           <ScrollArea>
             {items.map((item, index) => (
               <SidebarGroup key={index}>
-                <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
+                <SidebarGroupLabel className="text-(--color-brick-ember-100) ">{item.title}</SidebarGroupLabel>
                 <SidebarGroupContent>
                   <SidebarMenu>
                     {item.links?.map((item) => (
-                      <SidebarMenuItem key={item.title}>
+                      <SidebarMenuItem key={item.title} >
                         <SidebarMenuButton
                           asChild
+                       
                           className={` ${
                             url === item.url
-                              ? "bg-[var(--color-digital-blue-700)] text-white"
+                              ? "bg-[var(--color-brick-ember-600)] text-white"
                               : "text-[var(--sidebar-ring)]"
-                          }`}
+                          } hover:bg-(--color-brick-ember-100) hover:text-(--color-ink-black-950) `}
                         >
                           <a href={`/${item.url}`}>
                             <item.icon />

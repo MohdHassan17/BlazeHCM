@@ -79,12 +79,12 @@ function AttendanceChart() {
     shortHours: { label: "Short Hours" },
   } satisfies ChartConfig;
 
-  const STATUS_COLORS: Record<string, string> = {
-    Present: "#0652DD",
-    Late: "#FFC312",
-    Absent: "#EA2027",
-    Leave: "#C4E538",
-    HalfDay: "#009432",
+  const STATUS_COLORS: Record<string,string> = {
+    Present: "#03045e",
+    Late: "#fb8500",
+    Absent: "#dd2d4a",
+    // Leave: "#C4E538",
+    HalfDay: "#007f5f"
   };
 
   return (
@@ -106,12 +106,18 @@ function AttendanceChart() {
         <YAxis domain={[0, maxHours]} tickLine={false} axisLine={false} />
 
         <Bar dataKey="displayHours" radius={4} >
-          {configuredAttendance.map((entry, index) => (
-            <Cell
-              key={`cell-${index}`}
-              fill={STATUS_COLORS[entry.status] ?? "#000"}
-            />
-          ))}
+    {configuredAttendance.map((entry, index) => {
+
+
+    return (
+      <Cell
+        key={`cell-${index}`}
+        fill={STATUS_COLORS[entry.status]}        // 0 → background
+        // stroke={borderColor} // 1 → border
+        strokeWidth={1.5}
+      />
+    );
+  })}
         </Bar>
         <Tooltip
         cursor={false}

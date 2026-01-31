@@ -1,6 +1,8 @@
+import bcrypt from "bcryptjs";
 import User from "../../modules/auth/models/user.js";
 import UserRole from "../../modules/auth/models/userRole.js";
 import Employee from "../../modules/employee/models/employeeSchema.js";
+import { signToken } from "../../utils/jwt.js";
 
 
 
@@ -28,6 +30,7 @@ export const createUser = async ({ employee, role, email, password }) => {
 };
 
 
+
 export const getUserByEmployeeId = async (employeeId) => {
   try {
     const user = await User.findOne({ employee: employeeId }).populate("role").select("-password").lean();
@@ -36,6 +39,32 @@ export const getUserByEmployeeId = async (employeeId) => {
     return { success: false, message: error.message };
   }
 };
+
+
+export const loginUser = async(email, password) => {
+  try{
+
+    const user = await User.findOne({ email: email }).populate(['role', 'employee']);
+
+    if (!user) {
+      return { success: false, message: "User not found" };
+    }
+
+    // Compare password (assuming password is hashed)
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return { success: false, message: "Invalid password" };
+    }
+
+    const accessToken = signToken({ userId: user._id, employeeID: user.employee?.employeeId, email: user.email, permissions: user.role?.permissions });
+
+    return { success: true, user, accessToken };  
+
+  }catch(error){
+    return { success: false, message: error.message };
+  }
+}
 
 // Roles Services
 export const createRole = async (name, permissions) => {
