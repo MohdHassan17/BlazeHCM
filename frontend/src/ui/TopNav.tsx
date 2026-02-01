@@ -2,9 +2,11 @@ import type { ReactNode } from "react";
 
 // Asset and Component Imports
 
-import { Bell } from "lucide-react";
+import { Bell, CircleUserRound, LogOut } from "lucide-react";
 import { AvatarImage, Avatar, AvatarFallback } from "../components/ui/avatar";
 import { Badge } from "../components/ui/badge";
+import useAuth from "../hooks/use-auth";
+import {DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "../components/ui/dropdown-menu";
 
 function TopNav({ Trigger }: { Trigger: any }) {
   return (
@@ -36,12 +38,34 @@ function TopNav({ Trigger }: { Trigger: any }) {
 }
 
 function AvatarIcon() {
+
+  const {logout} = useAuth()
   return (
     <>
+
+
+    <DropdownMenu >
+
+      <DropdownMenuTrigger asChild>
+
       <Avatar>
         <AvatarImage src="./assets/components/avatar.png" alt="User Avatar" />
         <AvatarFallback>HN</AvatarFallback>
       </Avatar>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="text-(--text-primary) rounded-md" align="end">
+        <DropdownMenuGroup>
+          
+          <DropdownMenuItem>
+            <CircleUserRound/> My Profile
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={logout}>
+            <LogOut/> Logout
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    
+    </DropdownMenu>
     </>
   );
 }

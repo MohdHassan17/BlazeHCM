@@ -46,6 +46,7 @@ import {
   SidebarMenuButton,
 } from "../components/ui/sidebar";
 import { ScrollArea } from "../components/ui/scroll-area";
+import useAuth from "../hooks/use-auth";
 
 interface AppSidebarLinks {
   title: string;
@@ -55,6 +56,10 @@ interface AppSidebarLinks {
 }
 
 function AppSidebar({url} : {url:string}) {
+
+
+  const { logout} = useAuth()
+
   const items: AppSidebarLinks[] = [
     {
       title: "Dashboard",
@@ -295,6 +300,8 @@ function AppSidebar({url} : {url:string}) {
     </>
   );
 }
+
+
 
 const SideBar = React.memo(AppSidebar)
 
